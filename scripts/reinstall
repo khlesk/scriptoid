@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# If uninstall fails (e.g. plasmashell still holds files), continue with install/upgrade.
+"${SCRIPT_DIR}/uninstall" || true
+"${SCRIPT_DIR}/install"

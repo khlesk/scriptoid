@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/lib-metadata.sh"
+
+require_commands zip rm
+load_package_metadata
+
+ARCHIVE_PATH="${REPO_ROOT}/${PACKAGE_ID}-${PACKAGE_VERSION}.plasmoid"
+
+rm -f "${ARCHIVE_PATH}"
+
+(
+	cd "${PACKAGE_DIR}"
+	zip -qr "${ARCHIVE_PATH}" .
+)
+
+echo "Created ${ARCHIVE_PATH}"

@@ -1,0 +1,50 @@
+{
+  "KPackageStructure": "Plasma/Applet",
+  "KPlugin": {
+    "Authors": [
+      {
+        "Email": "",
+        "Name": "Nik"
+      }
+    ],
+    "Category": "Utilities",
+    "Description": "Run a command periodically and show its output.",
+    "Description[es]": "Ejecuta un comando periódicamente y muestra su salida.",
+    "Description[fr]": "Exécute une commande périodiquement et affiche sa sortie.",
+    "Description[hi]": "किसी कमांड को नियमित अंतराल पर चलाएं और उसका आउटपुट दिखाएं।",
+    "Description[pt]": "Executa um comando periodicamente e mostra a sua saída.",
+    "Description[uk]": "Періодично запускає команду та показує її вивід.",
+    "Description[zh_CN]": "定期运行命令并显示其输出。",
+    "EnabledByDefault": true,
+    "FormFactors": [
+      "desktop",
+      "horizontal",
+      "vertical"
+    ],
+    "Id": "com.github.khlesk.scriptoid",
+    "Icon": "utilities-terminal",
+    "License": "MIT",
+    "Name": "Scriptoid",
+    "Name[es]": "Scriptoid",
+    "Name[fr]": "Scriptoid",
+    "Name[hi]": "स्क्रिप्टॉइड",
+    "Name[pt]": "Scriptoid",
+    "Name[uk]": "Скриптоїд",
+    "Name[zh_CN]": "脚本器",
+    "Version": "0.1.0"
+  },
+  "X-Widget-Scripts": {
+    "Icons": {
+      "InstalledName": "com.github.khlesk.scriptoid",
+      "PngSource": "contents/images/icon.png",
+      "ScalableSource": "contents/images/icon.svg"
+    },
+    "Source": {
+      "GithubOwner": "khlesk",
+      "GithubRef": "master",
+      "GithubRepo": "scriptoid"
+    }
+  },
+  "X-Plasma-API-Minimum-Version": "6.0",
+  "X-Plasma-MainScript": "ui/main.qml"
+}

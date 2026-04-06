@@ -1,0 +1,124 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+LIB_METADATA_PATH="${SCRIPT_DIR}/lib-metadata.sh"
+DEFAULT_GITHUB_OWNER="khlesk"
+DEFAULT_GITHUB_REPO="scriptoid"
+DEFAULT_GITHUB_REF="master"
+
+ICON_ROOT="${HOME}/.local/share/icons/hicolor"
+TEMP_DIR=""
+
+cleanup() {
+	if [[ -n "${TEMP_DIR}" && -d "${TEMP_DIR}" ]]; then
+		rm -rf "${TEMP_DIR}"
+	fi
+}
+
+trap cleanup EXIT
+
+bootstrap_from_github() {
+	local owner repo ref archive_url archive_path extracted_root
+	local archive_fetcher
+
+	owner="${GITHUB_OWNER:-${DEFAULT_GITHUB_OWNER}}"
+	repo="${GITHUB_REPO:-${DEFAULT_GITHUB_REPO}}"
+	ref="${GITHUB_REF:-${DEFAULT_GITHUB_REF}}"
+	archive_url="${GITHUB_ARCHIVE_URL:-https://github.com/${owner}/${repo}/archive/refs/heads/${ref}.tar.gz}"
+
+	if command -v curl >/dev/null 2>&1; then
+		archive_fetcher="curl"
+	elif command -v wget >/dev/null 2>&1; then
+		archive_fetcher="wget"
+	else
+		echo "Error: curl or wget is required to download the package from GitHub." >&2
+		exit 1
+	fi
+
+	if ! command -v mktemp >/dev/null 2>&1 || ! command -v tar >/dev/null 2>&1 || ! command -v find >/dev/null 2>&1 || ! command -v head >/dev/null 2>&1; then
+		echo "Error: mktemp, tar, find, and head are required to bootstrap the installer." >&2
+		exit 1
+	fi
+
+	TEMP_DIR="$(mktemp -d)"
+	archive_path="${TEMP_DIR}/package.tar.gz"
+
+	echo "Bootstrapping installer from ${owner}/${repo}@${ref}"
+
+	if [[ "${archive_fetcher}" == "curl" ]]; then
+		curl -fsSL "${archive_url}" -o "${archive_path}"
+	else
+		wget -qO "${archive_path}" "${archive_url}"
+	fi
+
+	tar -xzf "${archive_path}" -C "${TEMP_DIR}"
+
+	extracted_root="$(find "${TEMP_DIR}" -mindepth 1 -maxdepth 1 -type d | head -n 1)"
+	if [[ -z "${extracted_root}" || ! -f "${extracted_root}/scripts/install" || ! -f "${extracted_root}/scripts/lib-metadata.sh" ]]; then
+		echo "Error: downloaded archive does not contain the installer files." >&2
+		exit 1
+	fi
+
+	bash "${extracted_root}/scripts/install" "$@"
+	exit $?
+}
+
+if [[ ! -f "${LIB_METADATA_PATH}" ]]; then
+	bootstrap_from_github "$@"
+fi
+
+source "${LIB_METADATA_PATH}"
+
+require_commands kpackagetool6 mktemp tar find head sed mkdir cp install rm
+require_package_metadata
+
+enable_packaged_icon() {
+	local installed_metadata installed_main
+
+	installed_metadata="${INSTALL_DIR}/metadata.json"
+	installed_main="${INSTALL_DIR}/contents/ui/main.qml"
+
+	if [[ -f "${installed_metadata}" ]]; then
+		sed -i "s/\"Icon\": \"${PACKAGE_ICON}\"/\"Icon\": \"${INSTALLED_ICON_NAME}\"/" "${installed_metadata}"
+	fi
+
+	if [[ -f "${installed_main}" ]]; then
+		sed -i "s/Plasmoid\\.icon: \"${PACKAGE_ICON}\"/Plasmoid.icon: \"${INSTALLED_ICON_NAME}\"/" "${installed_main}"
+	fi
+}
+
+PACKAGE_DIR="${REPO_ROOT}/package"
+METADATA_PATH="${PACKAGE_DIR}/metadata.json"
+load_package_metadata
+
+INSTALL_DIR="${HOME}/.local/share/plasma/plasmoids/${PACKAGE_ID}"
+SCALABLE_ICON_DIR="${ICON_ROOT}/scalable/apps"
+PNG_ICON_DIR="${ICON_ROOT}/256x256/apps"
+
+if kpackagetool6 -t "${PACKAGE_TYPE}" -s "${PACKAGE_ID}" >/dev/null 2>&1; then
+	echo "Upgrading installed plasmoid from ${PACKAGE_DIR}"
+	if ! kpackagetool6 -t "${PACKAGE_TYPE}" -u "${PACKAGE_DIR}"; then
+		echo "Upgrade failed, syncing files into ${INSTALL_DIR}"
+		mkdir -p "${INSTALL_DIR}"
+		cp -a "${PACKAGE_DIR}/." "${INSTALL_DIR}/"
+	fi
+else
+	echo "Installing plasmoid from ${PACKAGE_DIR}"
+	kpackagetool6 -t "${PACKAGE_TYPE}" -i "${PACKAGE_DIR}"
+fi
+
+mkdir -p "${EXAMPLES_INSTALL_DIR}"
+install -m 0755 "${SCRIPT_DIR}/status_example" "${EXAMPLES_INSTALL_DIR}/status_example"
+install -m 0755 "${SCRIPT_DIR}/top_example" "${EXAMPLES_INSTALL_DIR}/top_example"
+
+mkdir -p "${SCALABLE_ICON_DIR}" "${PNG_ICON_DIR}"
+install -m 0644 "${PACKAGE_DIR}/${SCALABLE_ICON_SOURCE}" "${SCALABLE_ICON_DIR}/${INSTALLED_ICON_NAME}.svg"
+install -m 0644 "${PACKAGE_DIR}/${PNG_ICON_SOURCE}" "${PNG_ICON_DIR}/${INSTALLED_ICON_NAME}.png"
+enable_packaged_icon
+
+if command -v gtk-update-icon-cache >/dev/null 2>&1; then
+	gtk-update-icon-cache -f -t "${ICON_ROOT}" >/dev/null 2>&1 || true
+fi
+
+echo "Installed example scripts to ${EXAMPLES_INSTALL_DIR}"

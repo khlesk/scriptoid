@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+
+mapfile -t qml_files < <(find "${REPO_ROOT}/package" -type f -name '*.qml' | sort)
+mapfile -t xml_files < <(find "${REPO_ROOT}/package" -type f -name '*.xml' | sort)
+mapfile -t shell_files < <(find "${REPO_ROOT}/scripts" -maxdepth 1 -type f | sort)
+
+if ((${#qml_files[@]} > 0)); then
+	qmlformat -i "${qml_files[@]}"
+fi
+
+if ((${#xml_files[@]} > 0)); then
+	for xml_file in "${xml_files[@]}"; do
+		xmllint --format "${xml_file}" -o "${xml_file}"
+	done
+fi
+
+if ((${#shell_files[@]} > 0)); then
+	shfmt -w "${shell_files[@]}"
+fi

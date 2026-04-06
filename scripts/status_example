@@ -1,0 +1,38 @@
+#!/bin/sh
+
+black='\033[0;30m'
+red='\033[0;31m'
+green='\033[0;32m'
+yellow='\033[0;33m'
+blue='\033[0;34m'
+magenta='\033[0;35m'
+cyan='\033[0;36m'
+light_gray='\033[0;37m'
+dark_gray='\033[1;30m'
+light_red='\033[1;31m'
+light_green='\033[1;32m'
+light_yellow='\033[1;33m'
+light_blue='\033[1;34m'
+light_magenta='\033[1;35m'
+light_cyan='\033[1;36m'
+white='\033[1;37m'
+
+gray='\033[38;2;128;128;128m'
+olive='\033[38;2;128;128;0m'
+proper_green='\033[38;2;0;128;0m'
+teal='\033[38;2;0;128;128m'
+
+reset='\033[0m'
+
+free_bytes=$(df --output=avail -B1 / | sed -n '2p')
+free_human=$(df -h / | awk 'NR==2 {print $4}')
+# choose color by bytes: >=100GB green, >=10GB yellow, <10GB red
+if [ "$free_bytes" -ge $((100 * 1024 ** 3)) ]; then
+	color_free="$proper_green"
+elif [ "$free_bytes" -ge $((10 * 1024 ** 3)) ]; then
+	color_free="$yellow"
+else
+	color_free="$red"
+fi
+
+echo -e "Disk free: ${color_free}${free_human}${reset} ${gray} | ${reset} Uptime: ${teal}$(uptime -p | sed 's/^up //')${reset}"

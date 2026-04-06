@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/lib-metadata.sh"
+
+require_commands kpackagetool6 rm
+load_package_metadata
+
+ICON_ROOT="${HOME}/.local/share/icons/hicolor"
+SCALABLE_ICON_PATH="${ICON_ROOT}/scalable/apps/${INSTALLED_ICON_NAME}.svg"
+PNG_ICON_PATH="${ICON_ROOT}/256x256/apps/${INSTALLED_ICON_NAME}.png"
+STATUS_EXAMPLE_PATH="${EXAMPLES_INSTALL_DIR}/status_example"
+TOP_EXAMPLE_PATH="${EXAMPLES_INSTALL_DIR}/top_example"
+
+if kpackagetool6 -t "${PACKAGE_TYPE}" -s "${PACKAGE_ID}" >/dev/null 2>&1; then
+	echo "Removing installed plasmoid ${PACKAGE_ID}"
+	kpackagetool6 -t "${PACKAGE_TYPE}" -r "${PACKAGE_ID}"
+else
+	echo "Plasmoid ${PACKAGE_ID} is not installed, nothing to remove."
+fi
+
+rm -f "${SCALABLE_ICON_PATH}" "${PNG_ICON_PATH}" "${STATUS_EXAMPLE_PATH}" "${TOP_EXAMPLE_PATH}"
+if [[ -d "${EXAMPLES_INSTALL_DIR}" ]]; then
+	rmdir --ignore-fail-on-non-empty "${EXAMPLES_INSTALL_DIR}" 2>/dev/null || true
+fi
+
+if command -v gtk-update-icon-cache >/dev/null 2>&1; then
+	gtk-update-icon-cache -f -t "${ICON_ROOT}" >/dev/null 2>&1 || true
+fi

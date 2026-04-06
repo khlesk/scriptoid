@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+    <title id="title">Clean Console to UI Icon</title>
+    <desc id="desc">Minimal terminal window with a clear prompt and spaced output lines on a soft circular background.</desc>
+
+    <defs>
+        <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+            <stop offset="0" stop-color="#18A0F0"/>
+            <stop offset="1" stop-color="#5C55F8"/>
+        </linearGradient>
+    </defs>
+
+    <!-- Soft circular backdrop -->
+    <circle cx="256" cy="256" r="232" fill="url(#g)"/>
+
+    <!-- Terminal window (centered) -->
+    <g transform="translate(96,136)">
+        <rect x="0" y="0" width="320" height="240" rx="12" fill="#071025" stroke="#0f1724" stroke-width="3"/>
+        <!-- Top accent bar -->
+        <rect x="0" y="0" width="320" height="36" rx="12" fill="#0b1a2a"/>
+        <!-- control dots (subtle) -->
+        <circle cx="22" cy="18" r="5" fill="#FF5C56"/>
+        <circle cx="44" cy="18" r="5" fill="#FFBD2E"/>
+        <circle cx="66" cy="18" r="5" fill="#27C93F"/>
+
+        <!-- Prompt and cursor, aligned and spaced -->
+        <g fill="#E6F2FF" font-family="monospace" font-weight="700">
+            <text x="28" y="88" font-size="64" fill="#8EE8FF" style="shape-rendering:crispEdges;">&gt;</text>
+            <rect x="84" y="74" width="44" height="10" rx="2" fill="#8EE8FF"/>
+        </g>
+
+        <!-- Output lines (even spacing, no overlapping) -->
+        <g fill="#98A8BD" opacity="0.95">
+            <rect x="28" y="120" width="264" height="8" rx="4"/>
+            <rect x="28" y="144" width="200" height="8" rx="4"/>
+            <rect x="28" y="168" width="160" height="8" rx="4"/>
+        </g>
+    </g>
+
+    <!-- Small sparkle to hint "UI" rendering (clean, single shape) -->
+    <g transform="translate(378,82)" fill="#FFFFFF" opacity="0.92">
+        <path d="M8 0l2.5 6.5L17 8l-6.5 1.5L8 17 6.5 9.5 0 8l6.5-1.5z"/>
+    </g>
+</svg>
