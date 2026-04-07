@@ -6,7 +6,7 @@ REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
 mapfile -t qml_files < <(find "${REPO_ROOT}/package" -type f -name '*.qml' | sort)
 mapfile -t xml_files < <(find "${REPO_ROOT}/package" -type f -name '*.xml' | sort)
-mapfile -t shell_files < <(find "${REPO_ROOT}/scripts" -maxdepth 1 -type f | sort)
+mapfile -t shell_files < <(find "${REPO_ROOT}/scripts" "${REPO_ROOT}/examples" -maxdepth 1 -type f | sort)
 
 if ((${#qml_files[@]} > 0)); then
 	qmlformat -i "${qml_files[@]}"

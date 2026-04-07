@@ -1,8 +1,10 @@
-# Scriptoid
+<p align="center">
+  <img src="package/contents/images/icon.svg" alt="Scriptoid icon" width="128" height="128">
+</p>
 
-![Screenshot](assets/screen.png)
+<h1 align="center">Scriptoid</h1>
 
-Scriptoid is a KDE Plasma widget that runs a shell command on a schedule and shows its output directly in your panel or on the desktop.
+KDE Plasma widget that runs a shell command on a schedule and shows its output directly in your panel or on the desktop.
 
 It is useful for small status scripts such as:
 
@@ -10,6 +12,8 @@ It is useful for small status scripts such as:
 - disk or memory usage
 - weather from a CLI tool
 - custom script output
+
+![Screenshot](assets/screen.png)
 
 ## Features
 
@@ -39,13 +43,13 @@ After that, add **Scriptoid** from the Plasma widget picker.
 Open the widget settings and set a command, for example:
 
 ```bash
-~/.local/share/scriptoid/examples/status_example
+~/.local/share/scriptoid/examples/status
 ```
 
 or:
 
 ```bash
-~/.local/share/scriptoid/examples/top_example
+~/.local/share/scriptoid/examples/top
 ```
 
 The widget refreshes the command at the configured interval and displays either stdout or stderr when stdout is empty.
@@ -64,5 +68,6 @@ Useful helper scripts:
 - `./scripts/install`
 - `./scripts/reinstall`
 - `./scripts/uninstall`
-- `./scripts/package`
 - `./scripts/restart-plasmashell`
+
+Example scripts live in `./examples`.

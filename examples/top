@@ -1,7 +1,7 @@
 #!/bin/env sh
 
 ESC=$'\e'
-printf "${ESC}[90m%-20s %5s %5s %s${ESC}[0m\n" "process" "cpu" "mem" "user" &&
+printf "${ESC}[90m%-20s %-6s %-6s %s${ESC}[0m\n" "process" "cpu %" "mem %" "user" &&
 	ps --no-headers -eo comm:20,%cpu:5,%mem:5,user --sort=-%cpu | head -n5 |
 	awk -v esc="$ESC" '{
   cpu=$2+0; mem=$3+0;
@@ -9,5 +9,5 @@ printf "${ESC}[90m%-20s %5s %5s %s${ESC}[0m\n" "process" "cpu" "mem" "user" &&
   cc=(cpu>20? esc "[31m" : (cpu>5? esc "[33m" : ""));
   mc=(mem>20? esc "[31m" : (mem>5? esc "[33m" : ""));
   uc=($4=="root"? esc "[31m" : esc "[34m");
-  printf "%-20s %s%5s%s %s%5s%s %s%s%s\n", $1, cc, $2, reset, mc, $3, reset, uc, $4, reset
+  printf "%-20s %s%-6s%s %s%-6s%s %s%s%s\n", $1, cc, $2, reset, mc, $3, reset, uc, $4, reset
 }'

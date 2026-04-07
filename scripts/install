@@ -89,6 +89,7 @@ enable_packaged_icon() {
 }
 
 PACKAGE_DIR="${REPO_ROOT}/package"
+EXAMPLES_DIR="${REPO_ROOT}/examples"
 METADATA_PATH="${PACKAGE_DIR}/metadata.json"
 load_package_metadata
 
@@ -109,8 +110,8 @@ else
 fi
 
 mkdir -p "${EXAMPLES_INSTALL_DIR}"
-install -m 0755 "${SCRIPT_DIR}/status_example" "${EXAMPLES_INSTALL_DIR}/status_example"
-install -m 0755 "${SCRIPT_DIR}/top_example" "${EXAMPLES_INSTALL_DIR}/top_example"
+install -m 0755 "${EXAMPLES_DIR}/status" "${EXAMPLES_INSTALL_DIR}/status"
+install -m 0755 "${EXAMPLES_DIR}/top" "${EXAMPLES_INSTALL_DIR}/top"
 
 mkdir -p "${SCALABLE_ICON_DIR}" "${PNG_ICON_DIR}"
 install -m 0644 "${PACKAGE_DIR}/${SCALABLE_ICON_SOURCE}" "${SCALABLE_ICON_DIR}/${INSTALLED_ICON_NAME}.svg"

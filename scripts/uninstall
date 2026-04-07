@@ -10,8 +10,8 @@ load_package_metadata
 ICON_ROOT="${HOME}/.local/share/icons/hicolor"
 SCALABLE_ICON_PATH="${ICON_ROOT}/scalable/apps/${INSTALLED_ICON_NAME}.svg"
 PNG_ICON_PATH="${ICON_ROOT}/256x256/apps/${INSTALLED_ICON_NAME}.png"
-STATUS_EXAMPLE_PATH="${EXAMPLES_INSTALL_DIR}/status_example"
-TOP_EXAMPLE_PATH="${EXAMPLES_INSTALL_DIR}/top_example"
+STATUS_EXAMPLE_PATH="${EXAMPLES_INSTALL_DIR}/status"
+TOP_EXAMPLE_PATH="${EXAMPLES_INSTALL_DIR}/top"
 
 if kpackagetool6 -t "${PACKAGE_TYPE}" -s "${PACKAGE_ID}" >/dev/null 2>&1; then
 	echo "Removing installed plasmoid ${PACKAGE_ID}"
