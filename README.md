@@ -26,6 +26,12 @@ Install directly from GitHub with a one-liner:
 bash <(curl -fsSL https://raw.githubusercontent.com/khlesk/scriptoid/master/scripts/install)
 ```
 
+For fish:
+
+```fish
+bash (curl -fsSL https://raw.githubusercontent.com/khlesk/scriptoid/master/scripts/install | psub)
+```
+
 After that, add **Scriptoid** from the Plasma widget picker.
 
 ## Configure
@@ -33,13 +39,13 @@ After that, add **Scriptoid** from the Plasma widget picker.
 Open the widget settings and set a command, for example:
 
 ```bash
-bash -lc '~/.local/share/scriptoid/examples/status_example'
+~/.local/share/scriptoid/examples/status_example
 ```
 
 or:
 
 ```bash
-bash -lc '~/.local/share/scriptoid/examples/top_example'
+~/.local/share/scriptoid/examples/top_example
 ```
 
 The widget refreshes the command at the configured interval and displays either stdout or stderr when stdout is empty.
@@ -59,3 +65,4 @@ Useful helper scripts:
 - `./scripts/reinstall`
 - `./scripts/uninstall`
 - `./scripts/package`
+- `./scripts/restart-plasmashell`
