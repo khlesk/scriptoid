@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
-    <title id="title">Clean Console to UI Icon</title>
-    <desc id="desc">Minimal terminal window with a clear prompt and spaced output lines on a soft circular background.</desc>
+    <title id="title">System Monitor UI Icon</title>
+    <desc id="desc">Minimal system monitor window with colored usage meters and process rows on a soft circular background.</desc>
 
     <defs>
         <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
@@ -23,17 +23,23 @@
         <circle cx="44" cy="18" r="5" fill="#FFBD2E"/>
         <circle cx="66" cy="18" r="5" fill="#27C93F"/>
 
-        <!-- Prompt and cursor, aligned and spaced -->
-        <g fill="#E6F2FF" font-family="monospace" font-weight="700">
-            <text x="28" y="88" font-size="64" fill="#8EE8FF" style="shape-rendering:crispEdges;">&gt;</text>
-            <rect x="84" y="74" width="44" height="10" rx="2" fill="#8EE8FF"/>
-        </g>
-
-        <!-- Output lines (even spacing, no overlapping) -->
-        <g fill="#98A8BD" opacity="0.95">
-            <rect x="28" y="120" width="264" height="8" rx="4"/>
-            <rect x="28" y="144" width="200" height="8" rx="4"/>
-            <rect x="28" y="168" width="160" height="8" rx="4"/>
+        <!-- htop-style meters and process rows, simplified for icon scale -->
+        <g opacity="0.96">
+            <rect x="28" y="58" width="66" height="8" rx="4" fill="#18D26E"/>
+            <rect x="100" y="58" width="118" height="8" rx="4" fill="#23D6E6"/>
+            <rect x="224" y="58" width="42" height="8" rx="4" fill="#FFD166"/>
+            <rect x="28" y="78" width="132" height="8" rx="4" fill="#18D26E"/>
+            <rect x="166" y="78" width="56" height="8" rx="4" fill="#23D6E6"/>
+            <rect x="228" y="78" width="36" height="8" rx="4" fill="#FF5C56"/>
+            <rect x="28" y="102" width="264" height="10" rx="3" fill="#122B46"/>
+            <rect x="28" y="102" width="46" height="10" rx="3" fill="#23D6E6"/>
+            <rect x="86" y="104" width="82" height="6" rx="3" fill="#E6F2FF"/>
+            <rect x="188" y="104" width="42" height="6" rx="3" fill="#98A8BD"/>
+            <rect x="244" y="104" width="28" height="6" rx="3" fill="#FFD166"/>
+            <rect x="28" y="128" width="244" height="8" rx="4" fill="#98A8BD"/>
+            <rect x="28" y="152" width="206" height="8" rx="4" fill="#6EE7B7"/>
+            <rect x="28" y="176" width="228" height="8" rx="4" fill="#98A8BD"/>
+            <rect x="28" y="200" width="174" height="8" rx="4" fill="#23D6E6"/>
         </g>
     </g>
 
