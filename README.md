@@ -20,7 +20,10 @@ It is useful for small status scripts such as:
 - periodic command execution
 - compact text output for panels and desktop
 - optional ANSI color rendering
-- configurable refresh interval, padding, font, color, and alignment
+- configurable refresh interval, width mode, padding, font, color, and alignment
+- optional separate tooltip command with its own refresh interval
+- optional custom default tooltip text
+- quick edit button for commands that point directly to local script files
 
 ## Install
 
