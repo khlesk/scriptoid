@@ -1,3 +1,4 @@
+import "../code/Localization.js" as Localization
 import QtQuick
 import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
@@ -9,12 +10,13 @@ import org.kde.plasma.plasmoid
 PlasmoidItem {
     id: root
 
+    readonly property string localeName: Qt.locale().name || "en_US"
     readonly property string command: String(Plasmoid.configuration.command ?? "").trim()
     readonly property int intervalSeconds: normalizedNumber(Plasmoid.configuration.intervalSeconds, 60, 1)
     readonly property bool tooltipEnabled: normalizedBool(Plasmoid.configuration.tooltipEnabled, false)
     readonly property string tooltipCommand: String(Plasmoid.configuration.tooltipCommand ?? "").trim()
     readonly property int tooltipIntervalSeconds: normalizedNumber(Plasmoid.configuration.tooltipIntervalSeconds, 60, 1)
-    readonly property string tooltipDefaultText: normalizedString(Plasmoid.configuration.tooltipDefaultText, i18n("Scriptoid"))
+    readonly property string tooltipDefaultText: normalizedString(Plasmoid.configuration.tooltipDefaultText, l10n("Scriptoid"))
     readonly property bool fillWidthSetting: normalizedBool(Plasmoid.configuration.fillWidth, true)
     readonly property int padding: normalizedNumber(Plasmoid.configuration.padding, 8, 0)
     readonly property bool useCustomFontSize: normalizedBool(Plasmoid.configuration.useCustomFontSize, false)
@@ -25,12 +27,16 @@ PlasmoidItem {
     readonly property string customColor: String(Plasmoid.configuration.customColor ?? "").trim()
     readonly property string textAlignment: normalizedAlignment(Plasmoid.configuration.textAlignment)
     readonly property bool useMonospaceFont: normalizedBool(Plasmoid.configuration.useMonospaceFont, false)
-    property string displayText: command.length ? i18n("Loading…") : i18n("No command set")
+    property string displayText: command.length ? l10n("Loading…") : l10n("No command set")
     property string displayMarkup: displayText
     property bool displayUsesRichText: false
     property string currentSource: ""
-    property string tooltipText: tooltipEnabled ? (tooltipCommand.length ? i18n("Loading…") : tooltipDefaultText) : tooltipDefaultText
+    property string tooltipText: tooltipEnabled ? (tooltipCommand.length ? l10n("Loading…") : tooltipDefaultText) : tooltipDefaultText
     property string currentTooltipSource: ""
+
+    function l10n(key) {
+        return Localization.translate(localeName, key, i18n(key));
+    }
 
     function normalizedNumber(value, fallback, minimum) {
         const parsed = Number(value);
@@ -196,7 +202,7 @@ PlasmoidItem {
     function refreshCommand() {
         if (!command.length) {
             disconnectCurrentSource();
-            displayText = i18n("No command set");
+            displayText = l10n("No command set");
             displayMarkup = displayText;
             displayUsesRichText = false;
             return ;
@@ -238,7 +244,7 @@ PlasmoidItem {
             nextText = trimOutput(stderr);
 
         if (!nextText.length)
-            nextText = exitCode === 0 ? i18n("No output") : i18n("Command failed");
+            nextText = exitCode === 0 ? l10n("No output") : l10n("Command failed");
 
         const formatted = ansiToHtml(nextText);
         displayText = formatted.text;
@@ -255,7 +261,7 @@ PlasmoidItem {
             nextText = trimOutput(stderr);
 
         if (!nextText.length)
-            nextText = exitCode === 0 ? i18n("No output") : i18n("Command failed");
+            nextText = exitCode === 0 ? l10n("No output") : l10n("Command failed");
 
         tooltipText = stripAnsi(nextText);
     }
@@ -279,18 +285,18 @@ PlasmoidItem {
         refreshTooltipCommand();
     }
     onCommandChanged: {
-        displayText = command.length ? i18n("Loading…") : i18n("No command set");
+        displayText = command.length ? l10n("Loading…") : l10n("No command set");
         displayMarkup = displayText;
         displayUsesRichText = false;
         refreshCommand();
     }
     onIntervalSecondsChanged: refreshCommand()
     onTooltipEnabledChanged: {
-        tooltipText = tooltipEnabled ? (tooltipCommand.length ? i18n("Loading…") : tooltipDefaultText) : tooltipDefaultText;
+        tooltipText = tooltipEnabled ? (tooltipCommand.length ? l10n("Loading…") : tooltipDefaultText) : tooltipDefaultText;
         refreshTooltipCommand();
     }
     onTooltipCommandChanged: {
-        tooltipText = tooltipEnabled ? (tooltipCommand.length ? i18n("Loading…") : tooltipDefaultText) : tooltipDefaultText;
+        tooltipText = tooltipEnabled ? (tooltipCommand.length ? l10n("Loading…") : tooltipDefaultText) : tooltipDefaultText;
         refreshTooltipCommand();
     }
     onTooltipIntervalSecondsChanged: refreshTooltipCommand()

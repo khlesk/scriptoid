@@ -1,3 +1,4 @@
+import "../../code/Localization.js" as Localization
 import QtCore
 import QtQuick
 import QtQuick.Controls as QQC2
@@ -7,6 +8,7 @@ import org.kde.kirigami as Kirigami
 Kirigami.FormLayout {
     id: formLayout
 
+    readonly property string localeName: Qt.locale().name || "en_US"
     property string title
     property alias cfg_command: commandField.text
     property string cfg_commandDefault
@@ -34,6 +36,10 @@ Kirigami.FormLayout {
     property string cfg_textAlignmentDefault: "center"
     readonly property int fieldIndent: Kirigami.Units.smallSpacing
     readonly property url homeUrl: StandardPaths.writableLocation(StandardPaths.HomeLocation)
+
+    function l10n(key) {
+        return Localization.translate(localeName, key, i18n(key));
+    }
 
     function textOrEmpty(value) {
         return value === undefined || value === null ? "" : String(value);
@@ -125,7 +131,7 @@ Kirigami.FormLayout {
     }
 
     RowLayout {
-        Kirigami.FormData.label: i18n("Command:")
+        Kirigami.FormData.label: formLayout.l10n("Command:")
         Layout.fillWidth: true
         spacing: formLayout.fieldIndent
 
@@ -137,16 +143,16 @@ Kirigami.FormLayout {
             id: commandField
 
             Layout.fillWidth: true
-            placeholderText: i18n("bash -lc '/path/to/script.sh'")
+            placeholderText: formLayout.l10n("bash -lc '/path/to/script.sh'")
         }
 
         QQC2.Button {
             icon.name: "document-edit"
-            text: i18n("Edit")
+            text: formLayout.l10n("Edit")
             enabled: formLayout.canEditPath(commandField.text)
             onClicked: formLayout.openConfiguredFile(commandField.text)
             QQC2.ToolTip.visible: hovered
-            QQC2.ToolTip.text: enabled ? i18n("Open the configured script in the default text editor") : i18n("Set the command to a file path like /path/to/script.sh or ~/script.sh to enable editing")
+            QQC2.ToolTip.text: enabled ? formLayout.l10n("Open the configured script in the default text editor") : formLayout.l10n("Set the command to a file path like /path/to/script.sh or ~/script.sh to enable editing")
         }
 
         Item {
@@ -156,7 +162,7 @@ Kirigami.FormLayout {
     }
 
     RowLayout {
-        Kirigami.FormData.label: i18n("Refresh (s):")
+        Kirigami.FormData.label: formLayout.l10n("Refresh (s):")
         spacing: 0
 
         Item {
@@ -174,7 +180,7 @@ Kirigami.FormLayout {
     }
 
     RowLayout {
-        Kirigami.FormData.label: i18n("Width mode:")
+        Kirigami.FormData.label: formLayout.l10n("Width mode:")
         spacing: 0
 
         Item {
@@ -184,13 +190,13 @@ Kirigami.FormLayout {
         QQC2.CheckBox {
             id: fillWidthCheck
 
-            text: i18n("Fill available panel space")
+            text: formLayout.l10n("Fill available panel space")
         }
 
     }
 
     RowLayout {
-        Kirigami.FormData.label: i18n("Padding:")
+        Kirigami.FormData.label: formLayout.l10n("Padding:")
         spacing: 0
 
         Item {
@@ -208,7 +214,7 @@ Kirigami.FormLayout {
     }
 
     RowLayout {
-        Kirigami.FormData.label: i18n("Font size:")
+        Kirigami.FormData.label: formLayout.l10n("Font size:")
         spacing: 0
 
         Item {
@@ -218,7 +224,7 @@ Kirigami.FormLayout {
         QQC2.CheckBox {
             id: customFontSizeCheck
 
-            text: i18n("Override font size")
+            text: formLayout.l10n("Override font size")
         }
 
     }
@@ -242,7 +248,7 @@ Kirigami.FormLayout {
     }
 
     RowLayout {
-        Kirigami.FormData.label: i18n("Font family:")
+        Kirigami.FormData.label: formLayout.l10n("Font family:")
         spacing: 0
 
         Item {
@@ -252,7 +258,7 @@ Kirigami.FormLayout {
         QQC2.CheckBox {
             id: useMonospaceFontCheck
 
-            text: i18n("Use fixed-width font")
+            text: formLayout.l10n("Use fixed-width font")
         }
 
     }
@@ -267,7 +273,7 @@ Kirigami.FormLayout {
         QQC2.CheckBox {
             id: customFontFamilyCheck
 
-            text: i18n("Override font family")
+            text: formLayout.l10n("Override font family")
         }
 
     }
@@ -285,7 +291,7 @@ Kirigami.FormLayout {
 
             Layout.fillWidth: true
             enabled: customFontFamilyCheck.checked
-            placeholderText: i18n("Hack")
+            placeholderText: formLayout.l10n("Hack")
         }
 
         Item {
@@ -295,7 +301,7 @@ Kirigami.FormLayout {
     }
 
     RowLayout {
-        Kirigami.FormData.label: i18n("Text color:")
+        Kirigami.FormData.label: formLayout.l10n("Text color:")
         spacing: 0
 
         Item {
@@ -305,7 +311,7 @@ Kirigami.FormLayout {
         QQC2.CheckBox {
             id: customColorCheck
 
-            text: i18n("Override theme text color")
+            text: formLayout.l10n("Override theme text color")
         }
 
     }
@@ -338,7 +344,7 @@ Kirigami.FormLayout {
     }
 
     RowLayout {
-        Kirigami.FormData.label: i18n("Text align:")
+        Kirigami.FormData.label: formLayout.l10n("Text align:")
         spacing: 0
 
         Item {
@@ -350,13 +356,13 @@ Kirigami.FormLayout {
 
             textRole: "text"
             model: [{
-                "text": i18n("Left"),
+                "text": formLayout.l10n("Left"),
                 "value": "left"
             }, {
-                "text": i18n("Center"),
+                "text": formLayout.l10n("Center"),
                 "value": "center"
             }, {
-                "text": i18n("Right"),
+                "text": formLayout.l10n("Right"),
                 "value": "right"
             }]
             currentIndex: alignmentIndex(cfg_textAlignment)

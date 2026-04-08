@@ -1,3 +1,4 @@
+import "../../code/Localization.js" as Localization
 import QtCore
 import QtQuick
 import QtQuick.Controls as QQC2
@@ -7,6 +8,7 @@ import org.kde.kirigami as Kirigami
 Kirigami.FormLayout {
     id: formLayout
 
+    readonly property string localeName: Qt.locale().name || "en_US"
     property string title
     property alias cfg_tooltipEnabled: tooltipEnabledCheck.checked
     property bool cfg_tooltipEnabledDefault: false
@@ -15,9 +17,13 @@ Kirigami.FormLayout {
     property alias cfg_tooltipIntervalSeconds: tooltipIntervalField.value
     property int cfg_tooltipIntervalSecondsDefault: 60
     property alias cfg_tooltipDefaultText: tooltipDefaultTextField.text
-    property string cfg_tooltipDefaultTextDefault: i18n("Scriptoid")
+    property string cfg_tooltipDefaultTextDefault: l10n("Scriptoid")
     readonly property int fieldIndent: Kirigami.Units.smallSpacing
     readonly property url homeUrl: StandardPaths.writableLocation(StandardPaths.HomeLocation)
+
+    function l10n(key) {
+        return Localization.translate(localeName, key, i18n(key));
+    }
 
     function textOrEmpty(value) {
         return value === undefined || value === null ? "" : String(value);
@@ -83,7 +89,7 @@ Kirigami.FormLayout {
     }
 
     RowLayout {
-        Kirigami.FormData.label: i18n("Tooltip:")
+        Kirigami.FormData.label: formLayout.l10n("Tooltip:")
         spacing: 0
 
         Item {
@@ -93,13 +99,13 @@ Kirigami.FormLayout {
         QQC2.CheckBox {
             id: tooltipEnabledCheck
 
-            text: i18n("Run command for tooltip text")
+            text: formLayout.l10n("Run command for tooltip text")
         }
 
     }
 
     RowLayout {
-        Kirigami.FormData.label: i18n("Command:")
+        Kirigami.FormData.label: formLayout.l10n("Command:")
         Layout.fillWidth: true
         spacing: formLayout.fieldIndent
 
@@ -112,16 +118,16 @@ Kirigami.FormLayout {
 
             Layout.fillWidth: true
             enabled: formLayout.cfg_tooltipEnabled
-            placeholderText: i18n("bash -lc '/path/to/script.sh'")
+            placeholderText: formLayout.l10n("bash -lc '/path/to/script.sh'")
         }
 
         QQC2.Button {
             icon.name: "document-edit"
-            text: i18n("Edit")
+            text: formLayout.l10n("Edit")
             enabled: formLayout.cfg_tooltipEnabled && formLayout.canEditPath(tooltipCommandField.text)
             onClicked: formLayout.openConfiguredFile(tooltipCommandField.text)
             QQC2.ToolTip.visible: hovered
-            QQC2.ToolTip.text: enabled ? i18n("Open the configured script in the default text editor") : i18n("Set the command to a file path like /path/to/script.sh or ~/script.sh to enable editing")
+            QQC2.ToolTip.text: enabled ? formLayout.l10n("Open the configured script in the default text editor") : formLayout.l10n("Set the command to a file path like /path/to/script.sh or ~/script.sh to enable editing")
         }
 
         Item {
@@ -131,7 +137,7 @@ Kirigami.FormLayout {
     }
 
     RowLayout {
-        Kirigami.FormData.label: i18n("Refresh (s):")
+        Kirigami.FormData.label: formLayout.l10n("Refresh (s):")
         spacing: 0
 
         Item {
@@ -150,7 +156,7 @@ Kirigami.FormLayout {
     }
 
     RowLayout {
-        Kirigami.FormData.label: i18n("Default text:")
+        Kirigami.FormData.label: formLayout.l10n("Default text:")
         Layout.fillWidth: true
         spacing: 0
 
@@ -162,7 +168,7 @@ Kirigami.FormLayout {
             id: tooltipDefaultTextField
 
             Layout.fillWidth: true
-            placeholderText: i18n("Scriptoid")
+            placeholderText: formLayout.l10n("Scriptoid")
         }
 
         Item {
