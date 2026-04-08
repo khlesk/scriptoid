@@ -1,3 +1,4 @@
+import QtCore
 import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
@@ -32,6 +33,61 @@ Kirigami.FormLayout {
     property string cfg_textAlignment: "center"
     property string cfg_textAlignmentDefault: "center"
     readonly property int fieldIndent: Kirigami.Units.smallSpacing
+    readonly property url homeUrl: StandardPaths.writableLocation(StandardPaths.HomeLocation)
+
+    function textOrEmpty(value) {
+        return value === undefined || value === null ? "" : String(value);
+    }
+
+    function shellSingleQuote(value) {
+        return "'" + textOrEmpty(value).replace(/'/g, "'\"'\"'") + "'";
+    }
+
+    function localPathFromUrl(value) {
+        var path = textOrEmpty(value);
+        if (path.indexOf("file://") === 0)
+            path = decodeURIComponent(path.slice("file://".length));
+
+        return path;
+    }
+
+    function normalizeEditablePath(path) {
+        var normalized = textOrEmpty(path).trim();
+        if (!normalized.length)
+            return "";
+
+        if (normalized.indexOf("file://") === 0)
+            normalized = decodeURIComponent(normalized.slice("file://".length));
+
+        if (normalized === "/" || normalized === "~" || normalized === "~/")
+            return "";
+
+        if (normalized.indexOf("~/") === 0)
+            normalized = localPathFromUrl(homeUrl) + normalized.slice(1);
+
+        if (normalized.charAt(0) !== "/")
+            return "";
+
+        if (normalized.indexOf("//") !== -1)
+            return "";
+
+        if (normalized.charAt(normalized.length - 1) === "/")
+            return "";
+
+        return normalized;
+    }
+
+    function canEditCommand(commandText) {
+        return normalizeEditablePath(commandText).length > 0;
+    }
+
+    function openCommandFile() {
+        var path = normalizeEditablePath(commandField.text);
+        if (!path.length)
+            return ;
+
+        Qt.openUrlExternally("file://" + encodeURI(path));
+    }
 
     function alignmentIndex(value) {
         if (value === "left")
@@ -71,7 +127,7 @@ Kirigami.FormLayout {
     RowLayout {
         Kirigami.FormData.label: i18n("Command:")
         Layout.fillWidth: true
-        spacing: 0
+        spacing: formLayout.fieldIndent
 
         Item {
             Layout.preferredWidth: formLayout.fieldIndent
@@ -82,6 +138,15 @@ Kirigami.FormLayout {
 
             Layout.fillWidth: true
             placeholderText: i18n("bash -lc '/path/to/script.sh'")
+        }
+
+        QQC2.Button {
+            icon.name: "document-edit"
+            text: i18n("Edit")
+            enabled: formLayout.canEditCommand(commandField.text)
+            onClicked: formLayout.openCommandFile()
+            QQC2.ToolTip.visible: hovered
+            QQC2.ToolTip.text: enabled ? i18n("Open the configured script in the default text editor") : i18n("Set the command to a file path like /path/to/script.sh or ~/script.sh to enable editing")
         }
 
         Item {

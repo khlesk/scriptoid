@@ -21,6 +21,12 @@ msgstr "Comando:"
 msgid "bash -lc '/path/to/script.sh'"
 msgstr "bash -lc '/ruta/al/script.sh'"
 
+msgid "Open the configured script in the default text editor"
+msgstr "Abrir el script configurado en el editor de texto predeterminado"
+
+msgid "Set the command to a file path like /path/to/script.sh or ~/script.sh to enable editing"
+msgstr "Establece el comando como una ruta de archivo como /path/to/script.sh o ~/script.sh para habilitar la edición"
+
 msgid "Refresh (s):"
 msgstr "Actualizar (s):"
 

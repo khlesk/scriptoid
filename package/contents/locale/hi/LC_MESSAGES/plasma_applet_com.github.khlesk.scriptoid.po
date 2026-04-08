@@ -21,6 +21,12 @@ msgstr "कमांड:"
 msgid "bash -lc '/path/to/script.sh'"
 msgstr "bash -lc '/path/to/script.sh'"
 
+msgid "Open the configured script in the default text editor"
+msgstr "कॉन्फ़िगर की गई स्क्रिप्ट को डिफ़ॉल्ट टेक्स्ट एडिटर में खोलें"
+
+msgid "Set the command to a file path like /path/to/script.sh or ~/script.sh to enable editing"
+msgstr "संपादन सक्षम करने के लिए कमांड को /path/to/script.sh या ~/script.sh जैसे फ़ाइल पथ पर सेट करें"
+
 msgid "Refresh (s):"
 msgstr "रीफ्रेश (से):"
 

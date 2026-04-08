@@ -21,6 +21,12 @@ msgstr "命令："
 msgid "bash -lc '/path/to/script.sh'"
 msgstr "bash -lc '/path/to/script.sh'"
 
+msgid "Open the configured script in the default text editor"
+msgstr "在默认文本编辑器中打开已配置的脚本"
+
+msgid "Set the command to a file path like /path/to/script.sh or ~/script.sh to enable editing"
+msgstr "将命令设置为类似 /path/to/script.sh 或 ~/script.sh 的文件路径以启用编辑"
+
 msgid "Refresh (s):"
 msgstr "刷新（秒）："
 

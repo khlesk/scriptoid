@@ -21,6 +21,12 @@ msgstr "Команда:"
 msgid "bash -lc '/path/to/script.sh'"
 msgstr "bash -lc '/шлях/до/script.sh'"
 
+msgid "Open the configured script in the default text editor"
+msgstr "Відкрити налаштований скрипт у типовому текстовому редакторі"
+
+msgid "Set the command to a file path like /path/to/script.sh or ~/script.sh to enable editing"
+msgstr "Укажіть у команді шлях до файла, наприклад /path/to/script.sh або ~/script.sh, щоб увімкнути редагування"
+
 msgid "Refresh (s):"
 msgstr "Оновлення (с):"
 
