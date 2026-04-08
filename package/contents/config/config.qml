@@ -8,4 +8,10 @@ ConfigModel {
         source: "config/ConfigGeneral.qml"
     }
 
+    ConfigCategory {
+        name: i18n("Tooltip")
+        icon: "dialog-information"
+        source: "config/ConfigTooltip.qml"
+    }
+
 }

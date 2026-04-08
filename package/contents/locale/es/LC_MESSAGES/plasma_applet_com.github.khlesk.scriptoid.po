@@ -15,6 +15,9 @@ msgstr ""
 msgid "General"
 msgstr "General"
 
+msgid "Tooltip"
+msgstr "Información emergente"
+
 msgid "Command:"
 msgstr "Comando:"
 
@@ -29,6 +32,18 @@ msgstr "Establece el comando como una ruta de archivo como /path/to/script.sh o 
 
 msgid "Refresh (s):"
 msgstr "Actualizar (s):"
+
+msgid "Tooltip:"
+msgstr "Información emergente:"
+
+msgid "Run command for tooltip text"
+msgstr "Ejecutar comando para el texto de la información emergente"
+
+msgid "Default text:"
+msgstr "Texto predeterminado:"
+
+msgid "Run a command periodically and show its output."
+msgstr "Ejecuta un comando periódicamente y muestra su salida."
 
 msgid "Width mode:"
 msgstr "Modo de ancho:"

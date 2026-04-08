@@ -8,6 +8,18 @@
     <entry name="intervalSeconds" type="Int">
       <default>60</default>
     </entry>
+    <entry name="tooltipEnabled" type="Bool">
+      <default>false</default>
+    </entry>
+    <entry name="tooltipCommand" type="String">
+      <default/>
+    </entry>
+    <entry name="tooltipIntervalSeconds" type="Int">
+      <default>60</default>
+    </entry>
+    <entry name="tooltipDefaultText" type="String">
+      <default>Scriptoid</default>
+    </entry>
     <entry name="fillWidth" type="Bool">
       <default>true</default>
     </entry>

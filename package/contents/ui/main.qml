@@ -1,4 +1,7 @@
 import QtQuick
+import QtQuick.Layouts
+import org.kde.kirigami as Kirigami
+import org.kde.plasma.components as PlasmaComponents3
 import org.kde.plasma.core as PlasmaCore
 import org.kde.plasma.plasma5support as P5Support
 import org.kde.plasma.plasmoid
@@ -8,6 +11,10 @@ PlasmoidItem {
 
     readonly property string command: String(Plasmoid.configuration.command ?? "").trim()
     readonly property int intervalSeconds: normalizedNumber(Plasmoid.configuration.intervalSeconds, 60, 1)
+    readonly property bool tooltipEnabled: normalizedBool(Plasmoid.configuration.tooltipEnabled, false)
+    readonly property string tooltipCommand: String(Plasmoid.configuration.tooltipCommand ?? "").trim()
+    readonly property int tooltipIntervalSeconds: normalizedNumber(Plasmoid.configuration.tooltipIntervalSeconds, 60, 1)
+    readonly property string tooltipDefaultText: normalizedString(Plasmoid.configuration.tooltipDefaultText, i18n("Scriptoid"))
     readonly property bool fillWidthSetting: normalizedBool(Plasmoid.configuration.fillWidth, true)
     readonly property int padding: normalizedNumber(Plasmoid.configuration.padding, 8, 0)
     readonly property bool useCustomFontSize: normalizedBool(Plasmoid.configuration.useCustomFontSize, false)
@@ -22,6 +29,8 @@ PlasmoidItem {
     property string displayMarkup: displayText
     property bool displayUsesRichText: false
     property string currentSource: ""
+    property string tooltipText: tooltipEnabled ? (tooltipCommand.length ? i18n("Loading…") : tooltipDefaultText) : tooltipDefaultText
+    property string currentTooltipSource: ""
 
     function normalizedNumber(value, fallback, minimum) {
         const parsed = Number(value);
@@ -50,12 +59,24 @@ PlasmoidItem {
         return Boolean(value);
     }
 
+    function normalizedString(value, fallback) {
+        const normalized = String(value ?? "").trim();
+        return normalized.length ? normalized : fallback;
+    }
+
     function normalizedAlignment(value) {
         const normalized = String(value ?? "").trim().toLowerCase();
         if (normalized === "left" || normalized === "right")
             return normalized;
 
         return "center";
+    }
+
+    function horizontalAlignmentFor(value) {
+        if (value === "right")
+            return Text.AlignRight;
+
+        return Text.AlignLeft;
     }
 
     function trimOutput(text) {
@@ -185,6 +206,29 @@ PlasmoidItem {
         executable.connectSource(command);
     }
 
+    function disconnectCurrentTooltipSource() {
+        if (currentTooltipSource.length) {
+            tooltipExecutable.disconnectSource(currentTooltipSource);
+            currentTooltipSource = "";
+        }
+    }
+
+    function refreshTooltipCommand() {
+        if (!tooltipEnabled) {
+            disconnectCurrentTooltipSource();
+            tooltipText = tooltipDefaultText;
+            return ;
+        }
+        if (!tooltipCommand.length) {
+            disconnectCurrentTooltipSource();
+            tooltipText = tooltipDefaultText;
+            return ;
+        }
+        disconnectCurrentTooltipSource();
+        currentTooltipSource = tooltipCommand;
+        tooltipExecutable.connectSource(tooltipCommand);
+    }
+
     function applyCommandResult(data) {
         const stdout = String(data["stdout"] ?? "");
         const stderr = String(data["stderr"] ?? "");
@@ -202,9 +246,38 @@ PlasmoidItem {
         displayUsesRichText = formatted.hasAnsi;
     }
 
+    function applyTooltipResult(data) {
+        const stdout = String(data["stdout"] ?? "");
+        const stderr = String(data["stderr"] ?? "");
+        const exitCode = Number(data["exit code"] ?? data["exitCode"] ?? 0);
+        let nextText = trimOutput(stdout);
+        if (!nextText.length)
+            nextText = trimOutput(stderr);
+
+        if (!nextText.length)
+            nextText = exitCode === 0 ? i18n("No output") : i18n("Command failed");
+
+        tooltipText = stripAnsi(nextText);
+    }
+
     Plasmoid.backgroundHints: PlasmaCore.Types.NoBackground
     Plasmoid.icon: "utilities-terminal"
-    Component.onCompleted: refreshCommand()
+    toolTipMainText: ""
+    toolTipSubText: ""
+    toolTipTextFormat: Text.PlainText
+    Layout.fillWidth: fillWidthSetting
+    Layout.fillHeight: true
+    Layout.minimumWidth: fillWidthSetting ? 50 : textLabel.implicitWidth + (padding * 2)
+    Layout.preferredWidth: fillWidthSetting ? 200 : textLabel.implicitWidth + (padding * 2)
+    Layout.maximumWidth: fillWidthSetting ? Number.POSITIVE_INFINITY : textLabel.implicitWidth + (padding * 2)
+    Layout.minimumHeight: textLabel.implicitHeight + (padding * 2)
+    Layout.preferredHeight: textLabel.implicitHeight + (padding * 2)
+    implicitWidth: fillWidthSetting ? 200 : textLabel.implicitWidth + (padding * 2)
+    implicitHeight: textLabel.implicitHeight + (padding * 2)
+    Component.onCompleted: {
+        refreshCommand();
+        refreshTooltipCommand();
+    }
     onCommandChanged: {
         displayText = command.length ? i18n("Loading…") : i18n("No command set");
         displayMarkup = displayText;
@@ -212,6 +285,20 @@ PlasmoidItem {
         refreshCommand();
     }
     onIntervalSecondsChanged: refreshCommand()
+    onTooltipEnabledChanged: {
+        tooltipText = tooltipEnabled ? (tooltipCommand.length ? i18n("Loading…") : tooltipDefaultText) : tooltipDefaultText;
+        refreshTooltipCommand();
+    }
+    onTooltipCommandChanged: {
+        tooltipText = tooltipEnabled ? (tooltipCommand.length ? i18n("Loading…") : tooltipDefaultText) : tooltipDefaultText;
+        refreshTooltipCommand();
+    }
+    onTooltipIntervalSecondsChanged: refreshTooltipCommand()
+    onTooltipDefaultTextChanged: {
+        if (!tooltipEnabled)
+            tooltipText = tooltipDefaultText;
+
+    }
 
     P5Support.DataSource {
         id: executable
@@ -226,10 +313,62 @@ PlasmoidItem {
         }
     }
 
-    compactRepresentation: CompactRepresentation {
+    P5Support.DataSource {
+        id: tooltipExecutable
+
+        engine: "executable"
+        interval: root.tooltipIntervalSeconds * 1000
+        onNewData: function(sourceName, data) {
+            root.applyTooltipResult(data);
+            if (root.currentTooltipSource !== sourceName)
+                disconnectSource(sourceName);
+
+        }
     }
 
-    fullRepresentation: CompactRepresentation {
+    PlasmaCore.ToolTipArea {
+        id: textToolTipArea
+
+        anchors.horizontalCenter: root.textAlignment === "center" ? parent.horizontalCenter : undefined
+        anchors.left: root.textAlignment === "left" ? parent.left : undefined
+        anchors.right: root.textAlignment === "right" ? parent.right : undefined
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.leftMargin: root.padding
+        anchors.rightMargin: root.padding
+        width: Math.min(textLabel.implicitWidth, parent.width - (root.padding * 2))
+        height: textLabel.implicitHeight
+        active: true
+        mainText: ""
+        subText: root.tooltipText
+        textFormat: Text.PlainText
+
+        PlasmaComponents3.Label {
+            id: textLabel
+
+            anchors.fill: parent
+            horizontalAlignment: root.horizontalAlignmentFor(root.textAlignment)
+            verticalAlignment: Text.AlignVCenter
+            elide: Text.ElideNone
+            textFormat: root.displayUsesRichText ? Text.RichText : Text.PlainText
+            text: root.displayUsesRichText ? root.displayMarkup : root.displayText
+            font.family: {
+                if (root.useMonospaceFont)
+                    return Kirigami.Theme.fixedWidthFont.family;
+
+                if (root.useCustomFontFamily && root.fontFamily.length > 0)
+                    return root.fontFamily;
+
+                return Kirigami.Theme.defaultFont.family;
+            }
+            font.pixelSize: root.useCustomFontSize ? root.fontSize : Kirigami.Theme.defaultFont.pixelSize
+
+            Binding on color {
+                when: root.useCustomColor && root.customColor.length > 0
+                value: root.customColor
+            }
+
+        }
+
     }
 
 }

@@ -77,12 +77,12 @@ Kirigami.FormLayout {
         return normalized;
     }
 
-    function canEditCommand(commandText) {
+    function canEditPath(commandText) {
         return normalizeEditablePath(commandText).length > 0;
     }
 
-    function openCommandFile() {
-        var path = normalizeEditablePath(commandField.text);
+    function openConfiguredFile(commandText) {
+        var path = normalizeEditablePath(commandText);
         if (!path.length)
             return ;
 
@@ -143,8 +143,8 @@ Kirigami.FormLayout {
         QQC2.Button {
             icon.name: "document-edit"
             text: i18n("Edit")
-            enabled: formLayout.canEditCommand(commandField.text)
-            onClicked: formLayout.openCommandFile()
+            enabled: formLayout.canEditPath(commandField.text)
+            onClicked: formLayout.openConfiguredFile(commandField.text)
             QQC2.ToolTip.visible: hovered
             QQC2.ToolTip.text: enabled ? i18n("Open the configured script in the default text editor") : i18n("Set the command to a file path like /path/to/script.sh or ~/script.sh to enable editing")
         }

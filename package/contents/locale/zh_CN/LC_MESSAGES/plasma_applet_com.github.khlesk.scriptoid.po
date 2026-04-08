@@ -15,6 +15,9 @@ msgstr ""
 msgid "General"
 msgstr "常规"
 
+msgid "Tooltip"
+msgstr "工具提示"
+
 msgid "Command:"
 msgstr "命令："
 
@@ -29,6 +32,18 @@ msgstr "将命令设置为类似 /path/to/script.sh 或 ~/script.sh 的文件路
 
 msgid "Refresh (s):"
 msgstr "刷新（秒）："
+
+msgid "Tooltip:"
+msgstr "工具提示："
+
+msgid "Run command for tooltip text"
+msgstr "为工具提示文本运行命令"
+
+msgid "Default text:"
+msgstr "默认文本："
+
+msgid "Run a command periodically and show its output."
+msgstr "定期运行命令并显示其输出。"
 
 msgid "Width mode:"
 msgstr "宽度模式："

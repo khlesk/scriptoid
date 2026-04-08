@@ -3,8 +3,10 @@ import QtQuick
 import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
 import org.kde.plasma.components as PlasmaComponents3
+import org.kde.plasma.core as PlasmaCore
+import org.kde.plasma.plasmoid
 
-Item {
+PlasmaCore.ToolTipArea {
     id: compactRoot
 
     function horizontalAlignmentFor(value) {
@@ -14,6 +16,10 @@ Item {
         return Text.AlignLeft;
     }
 
+    active: true
+    mainText: ""
+    subText: root.tooltipText
+    textFormat: Text.PlainText
     Layout.fillWidth: root.fillWidthSetting
     Layout.fillHeight: true
     Layout.minimumWidth: root.fillWidthSetting ? 50 : textLabel.implicitWidth + (root.padding * 2)
