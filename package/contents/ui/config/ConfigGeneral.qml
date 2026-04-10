@@ -2,6 +2,7 @@ import "../../code/Localization.js" as Localization
 import QtCore
 import QtQuick
 import QtQuick.Controls as QQC2
+import QtQuick.Dialogs
 import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
 
@@ -28,7 +29,7 @@ Kirigami.FormLayout {
     property string cfg_fontFamilyDefault
     property alias cfg_useCustomColor: customColorCheck.checked
     property bool cfg_useCustomColorDefault: false
-    property alias cfg_customColor: customColorField.text
+    property alias cfg_customColor: customColorValue.value
     property string cfg_customColorDefault
     property alias cfg_useMonospaceFont: useMonospaceFontCheck.checked
     property bool cfg_useMonospaceFontDefault: false
@@ -185,6 +186,28 @@ Kirigami.FormLayout {
         return fontInfoProbe.fixedPitch;
     }
 
+    function effectiveCustomColor(value) {
+        var color = textOrEmpty(value).trim();
+        return color.length ? color : "#eff0f1";
+    }
+
+    function colorToConfigValue(color) {
+        function componentToHex(component) {
+            var clamped = Math.max(0, Math.min(255, Math.round(component * 255)));
+            var hex = clamped.toString(16);
+            return hex.length === 1 ? "0" + hex : hex;
+        }
+
+        var red = componentToHex(color.r);
+        var green = componentToHex(color.g);
+        var blue = componentToHex(color.b);
+        var alpha = componentToHex(color.a);
+        if (alpha === "ff")
+            return "#" + red + green + blue;
+
+        return "#" + red + green + blue + alpha;
+    }
+
     onCfg_textAlignmentChanged: alignmentField.currentIndex = alignmentIndex(cfg_textAlignment)
     onCfg_fontFamilyChanged: {
         refreshFontFamilyOptions(cfg_fontFamily);
@@ -205,6 +228,12 @@ Kirigami.FormLayout {
 
     QtObject {
         id: fontFamilyValue
+
+        property string value
+    }
+
+    QtObject {
+        id: customColorValue
 
         property string value
     }
@@ -286,6 +315,34 @@ Kirigami.FormLayout {
     }
 
     RowLayout {
+        Kirigami.FormData.label: formLayout.l10n("Text align:")
+        spacing: 0
+
+        Item {
+            Layout.preferredWidth: formLayout.fieldIndent
+        }
+
+        QQC2.ComboBox {
+            id: alignmentField
+
+            textRole: "text"
+            model: [{
+                "text": formLayout.l10n("Left"),
+                "value": "left"
+            }, {
+                "text": formLayout.l10n("Center"),
+                "value": "center"
+            }, {
+                "text": formLayout.l10n("Right"),
+                "value": "right"
+            }]
+            currentIndex: alignmentIndex(cfg_textAlignment)
+            onCurrentIndexChanged: cfg_textAlignment = alignmentValue(currentIndex)
+        }
+
+    }
+
+    RowLayout {
         Kirigami.FormData.label: formLayout.l10n("Padding:")
         spacing: 0
 
@@ -301,6 +358,11 @@ Kirigami.FormLayout {
             editable: true
         }
 
+    }
+
+    Item {
+        Kirigami.FormData.isSection: true
+        implicitHeight: Kirigami.Units.gridUnit
     }
 
     RowLayout {
@@ -476,49 +538,43 @@ Kirigami.FormLayout {
             Layout.preferredWidth: formLayout.fieldIndent
         }
 
-        QQC2.TextField {
+        QQC2.Button {
             id: customColorField
 
             Layout.preferredWidth: Kirigami.Units.gridUnit * 10
             enabled: customColorCheck.checked
-            placeholderText: "#eff0f1"
+            onClicked: colorDialog.open()
 
-            validator: RegularExpressionValidator {
-                regularExpression: /^(#[0-9a-fA-F]{6}|#[0-9a-fA-F]{8}|[A-Za-z]+)$/
+            contentItem: Item {
+                implicitWidth: colorSwatch.implicitWidth
+                implicitHeight: colorSwatch.implicitHeight
+
+                Rectangle {
+                    id: colorSwatch
+
+                    anchors.centerIn: parent
+                    implicitWidth: Kirigami.Units.gridUnit * 2
+                    implicitHeight: Kirigami.Units.gridUnit
+                    radius: Kirigami.Units.smallSpacing / 2
+                    color: formLayout.effectiveCustomColor(formLayout.cfg_customColor)
+                    border.width: 1
+                    border.color: Kirigami.Theme.textColor
+                }
+
             }
 
         }
 
-        Item {
-            Layout.preferredWidth: formLayout.fieldIndent
+        ColorDialog {
+            id: colorDialog
+
+            title: formLayout.l10n("Text color:")
+            selectedColor: formLayout.effectiveCustomColor(formLayout.cfg_customColor)
+            onAccepted: customColorValue.value = formLayout.colorToConfigValue(selectedColor)
         }
 
-    }
-
-    RowLayout {
-        Kirigami.FormData.label: formLayout.l10n("Text align:")
-        spacing: 0
-
         Item {
             Layout.preferredWidth: formLayout.fieldIndent
-        }
-
-        QQC2.ComboBox {
-            id: alignmentField
-
-            textRole: "text"
-            model: [{
-                "text": formLayout.l10n("Left"),
-                "value": "left"
-            }, {
-                "text": formLayout.l10n("Center"),
-                "value": "center"
-            }, {
-                "text": formLayout.l10n("Right"),
-                "value": "right"
-            }]
-            currentIndex: alignmentIndex(cfg_textAlignment)
-            onCurrentIndexChanged: cfg_textAlignment = alignmentValue(currentIndex)
         }
 
     }
