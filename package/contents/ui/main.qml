@@ -358,11 +358,11 @@ PlasmoidItem {
             textFormat: root.displayUsesRichText ? Text.RichText : Text.PlainText
             text: root.displayUsesRichText ? root.displayMarkup : root.displayText
             font.family: {
-                if (root.useMonospaceFont)
-                    return Kirigami.Theme.fixedWidthFont.family;
-
                 if (root.useCustomFontFamily && root.fontFamily.length > 0)
                     return root.fontFamily;
+
+                if (root.useMonospaceFont)
+                    return Kirigami.Theme.fixedWidthFont.family;
 
                 return Kirigami.Theme.defaultFont.family;
             }

@@ -24,7 +24,7 @@ Kirigami.FormLayout {
     property int cfg_fontSizeDefault: 12
     property alias cfg_useCustomFontFamily: customFontFamilyCheck.checked
     property bool cfg_useCustomFontFamilyDefault: false
-    property alias cfg_fontFamily: fontFamilyField.text
+    property alias cfg_fontFamily: fontFamilyValue.value
     property string cfg_fontFamilyDefault
     property alias cfg_useCustomColor: customColorCheck.checked
     property bool cfg_useCustomColorDefault: false
@@ -34,7 +34,11 @@ Kirigami.FormLayout {
     property bool cfg_useMonospaceFontDefault: false
     property string cfg_textAlignment: "center"
     property string cfg_textAlignmentDefault: "center"
+    property var fontFamilyOptions: []
+    property var filteredFontFamilyOptions: []
+    property string fontFamilyFilter: ""
     readonly property int fieldIndent: Kirigami.Units.smallSpacing
+    readonly property real trailingActionWidth: editButton.implicitWidth
     readonly property url homeUrl: StandardPaths.writableLocation(StandardPaths.HomeLocation)
 
     function l10n(key) {
@@ -115,7 +119,81 @@ Kirigami.FormLayout {
         return "center";
     }
 
+    function fontFamilyIndex(value, options) {
+        var normalized = textOrEmpty(value).trim();
+        var source = options || filteredFontFamilyOptions;
+        for (var i = 0; i < source.length; ++i) {
+            if (textOrEmpty(source[i].value) === normalized)
+                return i;
+
+        }
+        return -1;
+    }
+
+    function refreshFontFamilyOptions(selectedValue) {
+        var normalized = textOrEmpty(selectedValue).trim();
+        var fonts = Qt.fontFamilies();
+        var options = [];
+        var hasSelected = normalized.length === 0;
+        var requireMonospace = cfg_useMonospaceFont;
+        fonts.sort(function(left, right) {
+            return left.localeCompare(right);
+        });
+        for (var i = 0; i < fonts.length; ++i) {
+            var family = textOrEmpty(fonts[i]).trim();
+            if (!family.length)
+                continue;
+
+            if (requireMonospace && !isMonospaceFamily(family))
+                continue;
+
+            if (family === normalized)
+                hasSelected = true;
+
+            options.push({
+                "text": family,
+                "value": family
+            });
+        }
+        if (!hasSelected && normalized.length && (!requireMonospace || isMonospaceFamily(normalized)))
+            options.unshift({
+            "text": normalized,
+            "value": normalized
+        });
+
+        fontFamilyOptions = options;
+        refreshFilteredFontFamilyOptions();
+    }
+
+    function refreshFilteredFontFamilyOptions() {
+        var query = textOrEmpty(fontFamilyFilter).trim().toLocaleLowerCase();
+        var filtered = [];
+        for (var i = 0; i < fontFamilyOptions.length; ++i) {
+            var option = fontFamilyOptions[i];
+            var family = textOrEmpty(option.value);
+            if (!query.length || family.toLocaleLowerCase().indexOf(query) !== -1)
+                filtered.push(option);
+
+        }
+        filteredFontFamilyOptions = filtered;
+    }
+
+    function isMonospaceFamily(family) {
+        fontInfoProbe.font = Qt.font({
+            "family": family
+        });
+        return fontInfoProbe.fixedPitch;
+    }
+
     onCfg_textAlignmentChanged: alignmentField.currentIndex = alignmentIndex(cfg_textAlignment)
+    onCfg_fontFamilyChanged: {
+        refreshFontFamilyOptions(cfg_fontFamily);
+    }
+    onCfg_useMonospaceFontChanged: refreshFontFamilyOptions(cfg_fontFamily)
+    onFontFamilyFilterChanged: refreshFilteredFontFamilyOptions()
+    Component.onCompleted: {
+        refreshFontFamilyOptions(cfg_fontFamily);
+    }
 
     Binding {
         target: formLayout
@@ -123,6 +201,16 @@ Kirigami.FormLayout {
         value: formLayout.width
         when: formLayout.width > 0
         restoreMode: Binding.RestoreBinding
+    }
+
+    QtObject {
+        id: fontFamilyValue
+
+        property string value
+    }
+
+    FontInfo {
+        id: fontInfoProbe
     }
 
     QQC2.Label {
@@ -147,6 +235,8 @@ Kirigami.FormLayout {
         }
 
         QQC2.Button {
+            id: editButton
+
             icon.name: "document-edit"
             text: formLayout.l10n("Edit")
             enabled: formLayout.canEditPath(commandField.text)
@@ -286,12 +376,74 @@ Kirigami.FormLayout {
             Layout.preferredWidth: formLayout.fieldIndent
         }
 
-        QQC2.TextField {
+        QQC2.Button {
             id: fontFamilyField
 
             Layout.fillWidth: true
             enabled: customFontFamilyCheck.checked
-            placeholderText: formLayout.l10n("Hack")
+            text: formLayout.cfg_fontFamily.length ? formLayout.cfg_fontFamily : formLayout.l10n("Select font")
+            onClicked: fontFamilyPopup.open()
+
+            QQC2.Popup {
+                id: fontFamilyPopup
+
+                y: fontFamilyField.height
+                width: fontFamilyField.width
+                padding: Kirigami.Units.smallSpacing
+                onOpened: {
+                    formLayout.fontFamilyFilter = "";
+                    fontFamilySearchField.forceActiveFocus();
+                    fontFamilySearchField.selectAll();
+                }
+                onClosed: formLayout.fontFamilyFilter = ""
+
+                contentItem: ColumnLayout {
+                    spacing: Kirigami.Units.smallSpacing
+
+                    QQC2.TextField {
+                        id: fontFamilySearchField
+
+                        Layout.fillWidth: true
+                        placeholderText: formLayout.l10n("Search fonts")
+                        text: formLayout.fontFamilyFilter
+                        onTextChanged: formLayout.fontFamilyFilter = text
+                    }
+
+                    ListView {
+                        id: fontFamilyListView
+
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: Math.min(contentHeight, Kirigami.Units.gridUnit * 12)
+                        clip: true
+                        model: formLayout.filteredFontFamilyOptions
+                        boundsBehavior: Flickable.StopAtBounds
+
+                        delegate: QQC2.ItemDelegate {
+                            required property var modelData
+
+                            width: ListView.view.width
+                            text: modelData.text
+                            highlighted: modelData.value === formLayout.cfg_fontFamily
+                            onClicked: {
+                                fontFamilyValue.value = modelData.value;
+                                fontFamilyPopup.close();
+                            }
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+        Item {
+            Layout.preferredWidth: formLayout.fieldIndent
+        }
+
+        Item {
+            Layout.preferredWidth: formLayout.trailingActionWidth
         }
 
         Item {
@@ -327,7 +479,7 @@ Kirigami.FormLayout {
         QQC2.TextField {
             id: customColorField
 
-            Layout.fillWidth: true
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 10
             enabled: customColorCheck.checked
             placeholderText: "#eff0f1"
 
